@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { AuthenticationService } from '../../core/authentication/authentication.service';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Subscription } from 'rxjs';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-login',
@@ -14,7 +15,8 @@ export class LoginComponent {
   loginForm: FormGroup;
 
   constructor(private fb: FormBuilder,
-    private authenticationService: AuthenticationService
+    private authenticationService: AuthenticationService,
+    private router: Router
   ) {
     this.loginForm = this.fb.group({
       username: ['', Validators.required],
@@ -32,8 +34,13 @@ export class LoginComponent {
   }
 
   private login(username: string, password: string): Subscription {
-    return this.authenticationService.login(username, password).subscribe(response => {
-      console.log('Login successful:', response);
+    return this.authenticationService.login(username, password).subscribe(isAuthenticated => {
+        if(isAuthenticated) {
+          console.log('Login successful');
+          this.router.navigate(['/dashboard']);
+        } else {
+          console.log('Wrong credentials');
+        }
     })
   }
 

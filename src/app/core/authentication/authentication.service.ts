@@ -1,12 +1,14 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { catchError, map, of } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthenticationService {
 
-  public authToken: string | null = null;
+  private authToken: string | null = null;
+  private _isAuthenticated = false;
 
   constructor(private httpClient: HttpClient) { }
 
@@ -18,6 +20,14 @@ export class AuthenticationService {
     this.authToken = token;
   }
 
+  get isAuthenticated(): boolean {
+    return this._isAuthenticated;
+  }
+
+  private set isAuthenticated(value: boolean) {
+    this._isAuthenticated = value;
+  }
+
   public getAuthenticationHeader() {
     return 'Basic ' + this.authenticationToken;
   }
@@ -25,7 +35,22 @@ export class AuthenticationService {
   public login(username: string, password: string) {
     this.authenticationToken = btoa(username + ':' + password);
 
-    return this.httpClient.get('http://localhost:8080/api/login', { headers: { Authorization: this.getAuthenticationHeader() }, responseType: 'text' });
+    return this.httpClient.get(
+      'http://localhost:8080/api/login',
+      { 
+        observe: 'response',
+        headers: { Authorization: this.getAuthenticationHeader() } 
+      }
+    ).pipe(
+      map(response => {
+        this.isAuthenticated = response.status === 202
+        return this.isAuthenticated;
+      }),
+      catchError(() => {
+        this.isAuthenticated = false;
+        return of(false);
+      }
+    ));
   }
 
 }
