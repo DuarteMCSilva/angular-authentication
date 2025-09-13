@@ -53,6 +53,26 @@ export class AuthenticationService {
     ));
   }
 
+  public register(username: string, password: string) {
+    this.authenticationToken = btoa(username + ':' + password);
+
+    // TODO: Actual implement register endpoint..
+    return this.httpClient.get(
+      'http://localhost:8080/api/login',
+      {
+        observe: 'response',
+        headers: { Authorization: this.getAuthenticationHeader() } 
+      }
+    ).pipe(
+      map(response => {
+        return response.status === 202;
+      }),
+      catchError(() => {
+        return of(false);
+      }
+    ));
+  }
+
   public logout() {
     this.authenticationToken = null;
     this.isAuthenticated = false;

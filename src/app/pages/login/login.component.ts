@@ -13,7 +13,7 @@ import { SimpleFormComponent } from "../../shared/components/simple-form/simple-
   styleUrl: './login.component.css'
 })
 export class LoginComponent {
-  formConfig = {
+  readonly FORM_CONFIG = {
     formTitle: 'Login',
     formFields: [
       { label: 'Username', type: 'text', name: 'username', required: true },
@@ -24,7 +24,6 @@ export class LoginComponent {
   }
 
   errorMessage?: string;
-  subscriptions: Subscription[] = [];
 
   constructor(
     private authenticationService: AuthenticationService,
@@ -42,10 +41,6 @@ export class LoginComponent {
 
   onFormChanges() {
     this.errorMessage = undefined;
-  }
-
-  onLinkClick() {
-    this.router.navigate([this.formConfig.footerLink?.url]);
   }
 
   private login(username: string, password: string): Subscription {
