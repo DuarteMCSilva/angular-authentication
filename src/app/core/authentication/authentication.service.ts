@@ -53,4 +53,8 @@ export class AuthenticationService {
     ));
   }
 
+  public logout() {
+    this.authenticationToken = null;
+    this.isAuthenticated = false;
+  }
 }
