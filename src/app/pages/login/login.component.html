@@ -2,7 +2,10 @@
     <h2>Login</h2>
     <form [formGroup]="loginForm" (ngSubmit)="onLogin()">
         <input type="text" formControlName="username" placeholder="Username" required>
-        <input type="password" formControlName="password" placeholder="Password" required>
+        <input style="margin-bottom: 0;" type="password" formControlName="password" placeholder="Password" required>
+        <div class="error-box">
+            <div *ngIf="errorMessage" class="error"> {{ errorMessage }} </div>
+        </div>
         <button type="submit">Login</button>
         <div class="forgot-password">
             <a href="#">Forgot password?</a>

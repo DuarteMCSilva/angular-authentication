@@ -1,18 +1,22 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { AuthenticationService } from '../../core/authentication/authentication.service';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { Router } from '@angular/router';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-login',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, CommonModule],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css'
 })
-export class LoginComponent {
+export class LoginComponent implements OnDestroy {
 
   loginForm: FormGroup;
+  errorMessage?: string;
+
+  subscriptions: Subscription[] = [];
 
   constructor(private fb: FormBuilder,
     private authenticationService: AuthenticationService,
@@ -22,6 +26,13 @@ export class LoginComponent {
       username: ['', Validators.required],
       password: ['', Validators.required]
     });
+  }
+
+  ngOnInit(): void {
+    const subscribeToForm = this.loginForm.valueChanges.subscribe(() => {
+      this.errorMessage = undefined;
+    });
+    this.subscriptions.push(subscribeToForm);
   }
 
   onLogin() {
@@ -39,9 +50,13 @@ export class LoginComponent {
           console.log('Login successful');
           this.router.navigate(['/dashboard']);
         } else {
+          this.errorMessage = 'Invalid username or password';
           console.log('Wrong credentials');
         }
     })
   }
-
+  
+  ngOnDestroy(): void {
+    this.subscriptions.forEach(sub => sub.unsubscribe());
+  }
 }
