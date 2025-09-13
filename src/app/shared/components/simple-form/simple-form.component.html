@@ -1,0 +1,15 @@
+<div class="form-container">
+    <h2>{{ formTitle }}</h2>
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+        <ng-container *ngFor="let control of formFields">
+            <input [type]="control.type" [formControlName]="control.name" [placeholder]="control.label" [required]="!!control.required">
+        </ng-container>
+        <div class="error-box">
+            <div *ngIf="errorMessage" class="error"> {{ errorMessage }} </div>
+        </div>
+        <button type="submit">{{formSubmitText}}</button>
+        <div class="footer-link" *ngIf="toggleLink?.url">
+            <a [routerLink]="toggleLink?.url">{{ toggleLink?.text || toggleLink?.url }}</a>
+        </div>
+    </form>
+</div>

@@ -1,47 +1,51 @@
-import { Component, OnDestroy } from '@angular/core';
+import { Component } from '@angular/core';
 import { AuthenticationService } from '../../core/authentication/authentication.service';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { SimpleFormComponent } from "../../shared/components/simple-form/simple-form.component";
 
 @Component({
   selector: 'app-login',
-  imports: [ReactiveFormsModule, CommonModule],
+  imports: [ReactiveFormsModule, CommonModule, SimpleFormComponent, SimpleFormComponent],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css'
 })
-export class LoginComponent implements OnDestroy {
+export class LoginComponent {
+  formConfig = {
+    formTitle: 'Login',
+    formFields: [
+      { label: 'Username', type: 'text', name: 'username', required: true },
+      { label: 'Password', type: 'password', name: 'password', required: true }
+    ],
+    formSubmitText: 'Sign In',
+    footerLink: { text: "Don't have an account? Sign Up", url: '/register' }
+  }
 
-  loginForm: FormGroup;
   errorMessage?: string;
-
   subscriptions: Subscription[] = [];
 
-  constructor(private fb: FormBuilder,
+  constructor(
     private authenticationService: AuthenticationService,
     private router: Router
-  ) {
-    this.loginForm = this.fb.group({
-      username: ['', Validators.required],
-      password: ['', Validators.required]
-    });
-  }
+  ) { }
 
-  ngOnInit(): void {
-    const subscribeToForm = this.loginForm.valueChanges.subscribe(() => {
-      this.errorMessage = undefined;
-    });
-    this.subscriptions.push(subscribeToForm);
-  }
-
-  onLogin() {
-    if (this.loginForm.valid) {
-      const { username, password } = this.loginForm.value;
+  onLogin(loginForm: FormGroup) {
+    if (loginForm.valid) {
+      const { username, password } = loginForm.value;
       console.log('Username:', username);
       console.log('Password:', password);
       this.login(username, password);
     }
+  }
+
+  onFormChanges() {
+    this.errorMessage = undefined;
+  }
+
+  onLinkClick() {
+    this.router.navigate([this.formConfig.footerLink?.url]);
   }
 
   private login(username: string, password: string): Subscription {
@@ -54,9 +58,5 @@ export class LoginComponent implements OnDestroy {
           console.log('Wrong credentials');
         }
     })
-  }
-  
-  ngOnDestroy(): void {
-    this.subscriptions.forEach(sub => sub.unsubscribe());
   }
 }
