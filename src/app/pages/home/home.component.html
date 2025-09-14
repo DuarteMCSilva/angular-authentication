@@ -1,2 +1,6 @@
 <h1>Welcome!</h1>
-<button (click)="onLogout()">Logout</button>
+<div>
+    <button (click)="onLogout()">Logout</button>
+    <button routerLink="profile">My profile</button>
+</div>
+<router-outlet></router-outlet>
