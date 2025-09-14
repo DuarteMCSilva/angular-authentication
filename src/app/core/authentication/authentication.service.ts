@@ -1,11 +1,13 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { catchError, map, of } from 'rxjs';
+import { environment } from '../../../environments/environment.development';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthenticationService {
+  readonly serverUrl = environment.server;
 
   private authToken: string | null = null;
   private _isAuthenticated = false;
@@ -35,8 +37,7 @@ export class AuthenticationService {
   public login(username: string, password: string) {
     this.authenticationToken = btoa(username + ':' + password);
 
-    return this.httpClient.get(
-      'http://localhost:8080/api/login',
+    return this.httpClient.get( this.serverUrl + 'auth/login',
       { 
         observe: 'response',
         headers: { Authorization: this.getAuthenticationHeader() } 
@@ -57,15 +58,14 @@ export class AuthenticationService {
     this.authenticationToken = btoa(username + ':' + password);
 
     // TODO: Actual implement register endpoint..
-    return this.httpClient.get(
-      'http://localhost:8080/api/login',
+    return this.httpClient.post( this.serverUrl + 'auth/register',
+      {username, password},
       {
-        observe: 'response',
-        headers: { Authorization: this.getAuthenticationHeader() } 
+        observe: 'response'
       }
     ).pipe(
       map(response => {
-        return response.status === 202;
+        return response.status === 201;
       }),
       catchError(() => {
         return of(false);
