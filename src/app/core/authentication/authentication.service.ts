@@ -36,8 +36,8 @@ export class AuthenticationService {
 
   public login(username: string, password: string) {
     this.authenticationToken = btoa(username + ':' + password);
-
-    return this.httpClient.get( this.serverUrl + 'auth/login',
+    const url = this.serverUrl + 'auth/login';
+    return this.httpClient.get( url,
       { 
         observe: 'response',
         headers: { Authorization: this.getAuthenticationHeader() } 
@@ -57,9 +57,8 @@ export class AuthenticationService {
   public register(username: string, password: string) {
     this.authenticationToken = btoa(username + ':' + password);
 
-    // TODO: Actual implement register endpoint..
-    return this.httpClient.post( this.serverUrl + 'auth/register',
-      {username, password},
+    const url = this.serverUrl + 'auth/register'
+    return this.httpClient.post( url, {username, password},
       {
         observe: 'response'
       }
